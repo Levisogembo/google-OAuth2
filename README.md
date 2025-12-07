@@ -23,7 +23,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This is a simple NestJs project that focuses on authorization using Google OAuth2 and Sessions. The project allows users to automatically login using their gmail accounts allowing for federated logins and Single Sign-on (SSO). 
 
 ## Project setup
 
