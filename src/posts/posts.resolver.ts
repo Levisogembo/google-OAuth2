@@ -3,20 +3,31 @@ import { Posts } from 'src/typeorm/entities/Posts';
 import { PostsService } from './posts.service';
 import { createPostInput } from './dtos/createPost.input';
 import { use } from 'passport';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ROLES } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/user/dtos/enums/roles.enum';
+import { GqlJwtGuard } from 'src/auth/guards/gql-jwt-guard/gql-jwt-guard';
+import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
+import { currentUser } from 'src/auth/decorators/user.decorator';
 
 @Resolver(()=>Posts)
 @UsePipes(new ValidationPipe)
 export class PostsResolver {
     constructor(private postService: PostsService){}
 
+    @ROLES(Role.ADMIN,Role.USER)
+    @UseGuards(GqlJwtGuard,RolesGuard)
     @Query(()=>[Posts])
-    async getPosts(){
+    async getPosts(@currentUser() user){
+        console.log(user);
        return await this.postService.getAll() 
     }
 
+    @ROLES(Role.ADMIN,Role.USER)
+    @UseGuards(GqlJwtGuard,RolesGuard)
     @Mutation(()=>Posts)
-    async createPost(@Args("userId",{type:()=>String}) userId: string, @Args("postData") info: createPostInput){
+    async createPost(@currentUser() user, @Args("postData") info: createPostInput){
+        const userId = user.userId
         return await this.postService.createPost(userId,info)
     }
    

@@ -1,16 +1,25 @@
-import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Context, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { User } from 'src/typeorm/entities/User';
 import { UserService } from './user.service';
 import { createUserDto } from './dtos/createUser.dto';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { updateUserInput } from './dtos/updateUser.input';
+import { GqlJwtGuard } from 'src/auth/guards/gql-jwt-guard/gql-jwt-guard';
+import { log } from 'node:console';
+import { currentUser } from 'src/auth/decorators/user.decorator';
+import { Role } from './dtos/enums/roles.enum';
+import { ROLES } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 
 @Resolver(()=>User)
 export class UserResolver {
     constructor(private usersService: UserService){}
 
+    @ROLES(Role.USER,Role.ADMIN)
+    @UseGuards(GqlJwtGuard,RolesGuard)
     @Query(()=>[User],{name:'getUsers'})
-    async getUser(){
+    async getUser(@currentUser() user){ 
+        console.log(user);
         return await this.usersService.findAll()
     }
 

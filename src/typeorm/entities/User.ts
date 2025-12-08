@@ -19,6 +19,9 @@ export class User {
     @Column({unique:true})
     userName: string
 
+    @Column({nullable:true})
+    password: string
+
     @Field()
     @Column({
         type: 'enum',

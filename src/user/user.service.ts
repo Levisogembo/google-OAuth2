@@ -28,7 +28,7 @@ export class UserService {
     return user;
   }
 
-  async createUser({ email, userName, role }: createUserDto) {
+  async createUser({ email, userName }: createUserDto) {
     const foundEmail = await this.usersRepository.findOne({ where: { email } });
     if (foundEmail)
       throw new HttpException('email already exists', HttpStatus.BAD_REQUEST);
@@ -43,13 +43,12 @@ export class UserService {
     const newUser = await this.usersRepository.create({
       email,
       userName,
-      role,
       createdAt: new Date(),
     });
     return await this.usersRepository.save(newUser);
   }
 
-  async updateUser(userId: string, { email, userName, role }: updateUserInput) {
+  async updateUser(userId: string, { email, userName }: updateUserInput) {
     await this.findOneUser(userId);
     const foundEmail = await this.usersRepository.findOne({ where: { email } });
     if (foundEmail)
@@ -63,7 +62,7 @@ export class UserService {
         HttpStatus.BAD_REQUEST,
       );
     const filteredItems = Object.fromEntries(
-      Object.entries({ email, userName, role }).filter(
+      Object.entries({ email, userName }).filter(
         (_, value) => value !== undefined,
       ),
     );

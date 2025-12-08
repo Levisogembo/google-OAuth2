@@ -4,6 +4,7 @@ import * as session from 'express-session'
 import * as passport from 'passport'
 import { ConfigService } from '@nestjs/config';
 import { NotFoundExceptionFilter } from './not-found-exception/not-found-exception.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +21,7 @@ async function bootstrap() {
   app.use(passport.initialize())
   app.use(passport.session())
   app.useGlobalFilters(new NotFoundExceptionFilter())
+  app.useGlobalPipes(new ValidationPipe)
   await app.listen(process.env.PORT ?? 3000).then(()=>console.log('App is listening to requests on port 3000'));
 }
 bootstrap();
